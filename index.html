@@ -1,0 +1,2362 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Multi Table Designer Ultimate Pro - Offline Ready</title>
+
+    <script src="assets/js/mammoth.browser.min.js"></script>
+    <script src="assets/js/pdf.min.js"></script>
+    <script>
+        // Konfigurasi Worker untuk PDF.js
+        window.pdfjsLib.GlobalWorkerOptions.workerSrc = 'assets/js/pdf.worker.min.js';
+    </script>
+
+    <style>
+        /* Reset & Base */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        }
+
+        body {
+            background: #0a0a1a;
+            color: #e0e0e0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            padding: 16px 8px;
+            background: rgba(10, 10, 26, 0.92);
+            backdrop-filter: blur(8px);
+            border-bottom: 1px solid #2a3a6a;
+            flex-shrink: 0;
+        }
+
+            .header h1 {
+                background: linear-gradient(135deg, #00d2ff, #3a7bd5, #a855f7);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                font-size: 1.6rem;
+                letter-spacing: 1px;
+            }
+
+            .header small {
+                color: #8892b0;
+                font-size: 0.8rem;
+                display: block;
+                margin-top: 4px;
+            }
+
+        /* Main Navigation */
+        .tab-nav {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            background: #0f0f1f;
+            padding: 8px;
+            border-bottom: 1px solid #2a3a6a;
+            justify-content: center;
+        }
+
+            .tab-nav button {
+                padding: 10px 20px;
+                border: none;
+                border-radius: 8px;
+                background: transparent;
+                color: #a0aec0;
+                cursor: pointer;
+                font-weight: 600;
+                font-size: 0.9rem;
+                transition: all 0.2s;
+            }
+
+                .tab-nav button:hover, .tab-nav button.active {
+                    color: #fff;
+                    background: rgba(74, 122, 213, 0.2);
+                }
+
+                .tab-nav button.active {
+                    box-shadow: inset 0 -2px 0 #00d2ff;
+                }
+
+        /* Tab Container */
+        .tab-container {
+            flex: 1;
+            position: relative;
+            background: #0a0a1a;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .tab-panel {
+            display: none;
+            padding: 16px;
+            flex-direction: column;
+            gap: 16px;
+            width: 100%;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+            .tab-panel.active {
+                display: flex;
+            }
+
+        /* ===== WORKSPACE SUB-TABS ===== */
+        .workspace-sub-nav {
+            display: flex;
+            gap: 8px;
+            background: #101026;
+            padding: 6px;
+            border-radius: 10px;
+            border: 1px solid #2a3a6a;
+            align-self: center;
+            width: 100%;
+            max-width: 600px;
+            justify-content: center;
+        }
+
+            .workspace-sub-nav button {
+                flex: 1;
+                padding: 10px;
+                background: transparent;
+                border: none;
+                color: #a0aec0;
+                border-radius: 8px;
+                cursor: pointer;
+                font-weight: 600;
+                font-size: 0.85rem;
+                transition: 0.2s;
+                white-space: nowrap;
+            }
+
+                .workspace-sub-nav button.active {
+                    background: #2a3a6a;
+                    color: #00d2ff;
+                }
+
+        .workspace-slide-container {
+            width: 100%;
+        }
+
+        .workspace-slide {
+            display: none;
+            flex-direction: column;
+            gap: 16px;
+            background: #16213e;
+            border-radius: 16px;
+            border: 1px solid #2a3a6a;
+            padding: 20px;
+        }
+
+            .workspace-slide.active {
+                display: flex;
+            }
+
+        .panel-title {
+            font-size: 1.1rem;
+            color: #00d2ff;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border-bottom: 1px solid #2a3a6a;
+            padding-bottom: 10px;
+        }
+
+        /* ===== MS WORD STYLE TEXT EDITOR ===== */
+        .text-editor-wrapper {
+            display: flex;
+            flex-direction: column;
+            background: #ffffff;
+            border-radius: 12px;
+            border: 1px solid #cbd5e1;
+            overflow: hidden;
+        }
+
+        .text-toolbar {
+            display: flex;
+            gap: 4px;
+            padding: 8px;
+            background: #f8fafc;
+            border-bottom: 1px solid #e2e8f0;
+            flex-wrap: wrap;
+        }
+
+            .text-toolbar .group {
+                display: flex;
+                align-items: center;
+                gap: 2px;
+                border-right: 1px solid #cbd5e1;
+                padding-right: 6px;
+                margin-right: 4px;
+                flex-wrap: wrap;
+            }
+
+                .text-toolbar .group:last-child {
+                    border-right: none;
+                }
+
+            .text-toolbar button, .text-toolbar select, .text-toolbar input[type="color"] {
+                padding: 6px 10px;
+                background: transparent;
+                border: 1px solid transparent;
+                border-radius: 4px;
+                color: #334155;
+                font-size: 0.85rem;
+                cursor: pointer;
+                height: 32px;
+                font-weight: 500;
+                transition: 0.15s;
+            }
+
+                .text-toolbar button:hover {
+                    background: #e2e8f0;
+                    color: #0f172a;
+                }
+
+                .text-toolbar button.active-tool {
+                    background: #cbd5e1;
+                    color: #000;
+                    font-weight: bold;
+                }
+
+            .text-toolbar select {
+                background: #fff;
+                border: 1px solid #cbd5e1;
+            }
+
+            .text-toolbar input[type="color"] {
+                padding: 2px;
+                width: 32px;
+                background: #fff;
+                border: 1px solid #cbd5e1;
+            }
+
+        .wysiwyg-editor {
+            min-height: 350px;
+            padding: 24px;
+            overflow-y: auto;
+            outline: none;
+            color: #1e293b;
+            line-height: 1.6;
+            font-size: 1rem;
+            background: #ffffff;
+        }
+
+            .wysiwyg-editor:empty:before {
+                content: "Mulai ketik konten dokumen bergaya Microsoft Word di sini...";
+                color: #94a3b8;
+            }
+
+            /* Tweak agar sel tabel text editor terlihat saat transparan (outline putus-putus) */
+            .wysiwyg-editor table {
+                min-width: 50px;
+            }
+
+                .wysiwyg-editor table td {
+                    min-width: 20px;
+                    outline: 1px dashed rgba(204, 204, 204, 0.3);
+                }
+
+        /* ===== TABLE GRID CONTROL ===== */
+        .table-list {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+            margin-bottom: 4px;
+        }
+
+        .table-tab {
+            padding: 8px 16px;
+            background: #0f0f1f;
+            border: 1px solid #2a3a6a;
+            border-radius: 6px;
+            color: #a0aec0;
+            cursor: pointer;
+            font-size: 0.8rem;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+            .table-tab.active {
+                background: #2a3a6a;
+                color: #00d2ff;
+                border-color: #00d2ff;
+            }
+
+        .btn-close-tab {
+            background: transparent;
+            border: none;
+            color: #ff6b6b;
+            cursor: pointer;
+            font-weight: bold;
+            margin-left: 4px;
+        }
+
+        .controls-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 12px;
+        }
+
+        .control-row {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            align-items: center;
+            background: #0f0f1f;
+            padding: 12px;
+            border-radius: 10px;
+            border: 1px solid #2a3a6a;
+        }
+
+            .control-row label {
+                font-size: 0.75rem;
+                color: #aac4ff;
+                font-weight: 600;
+                display: flex;
+                align-items: center;
+                gap: 4px;
+            }
+
+            .control-row input, .control-row select {
+                padding: 6px 10px;
+                background: #16213e;
+                border: 1px solid #2a3a6a;
+                color: #e0e0e0;
+                border-radius: 6px;
+                font-size: 0.8rem;
+                outline: none;
+            }
+
+        .table-viewport {
+            width: 100%;
+            overflow: auto;
+            background: #0f0f1f;
+            border-radius: 12px;
+            border: 1px solid #2a3a6a;
+            padding: 12px;
+            min-height: 250px;
+        }
+
+        table.designer-table {
+            border-collapse: collapse;
+            table-layout: fixed;
+            width: max-content;
+            color: #e0e0e0;
+            user-select: none;
+        }
+
+            table.designer-table th, table.designer-table td {
+                border: 1px solid #3a4a7a;
+                position: relative;
+                padding: 0;
+                min-width: 50px;
+                height: 35px;
+                background: #0a0a1a;
+            }
+
+                table.designer-table td.selected {
+                    background: rgba(0, 210, 255, 0.25) !important;
+                    outline: 2px solid #00d2ff;
+                    z-index: 2;
+                }
+
+                table.designer-table td input {
+                    width: 100%;
+                    height: 100%;
+                    background: transparent;
+                    border: none;
+                    color: #fff;
+                    padding: 6px;
+                    font-size: 0.85rem;
+                    outline: none;
+                }
+
+        /* ===== FILE UPLOAD ===== */
+        .upload-zone {
+            border: 2px dashed #4a7ad5;
+            border-radius: 12px;
+            padding: 40px 20px;
+            text-align: center;
+            background: rgba(74, 122, 213, 0.05);
+            transition: 0.3s;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+
+            .upload-zone:hover {
+                background: rgba(74, 122, 213, 0.1);
+                border-color: #00d2ff;
+            }
+
+            .upload-zone p {
+                color: #a0aec0;
+                font-size: 0.95rem;
+            }
+
+            .upload-zone small {
+                color: #64748b;
+                font-size: 0.75rem;
+            }
+
+        .file-list-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 12px;
+            margin-top: 16px;
+        }
+
+        .file-item {
+            background: #0f0f1f;
+            border: 1px solid #2a3a6a;
+            border-radius: 8px;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            position: relative;
+        }
+
+            .file-item .file-preview {
+                height: 100px;
+                background: #050510;
+                border-radius: 4px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                overflow: hidden;
+                color: #4a7ad5;
+                font-size: 2rem;
+            }
+
+            .file-item img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+            }
+
+            .file-item .file-name {
+                font-size: 0.75rem;
+                color: #e0e0e0;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                text-align: center;
+            }
+
+            .file-item .btn-remove {
+                position: absolute;
+                top: 4px;
+                right: 4px;
+                background: #eb3349;
+                color: white;
+                border: none;
+                border-radius: 50%;
+                width: 24px;
+                height: 24px;
+                cursor: pointer;
+                font-size: 0.7rem;
+                font-weight: bold;
+                z-index: 10;
+            }
+
+        /* Actions Bar & General Buttons */
+        .action-bar {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-top: 8px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            justify-content: center;
+        }
+
+        .btn-mini {
+            padding: 6px 10px;
+            font-size: 0.75rem;
+            border-radius: 6px;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #00b4db, #0083b0);
+            color: white;
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #11998e, #38ef7d);
+            color: white;
+        }
+
+        .btn-danger {
+            background: #eb3349;
+            color: white;
+        }
+
+        .btn-warning {
+            background: #f7971e;
+            color: #000;
+        }
+
+        /* ===== SOURCE CODE SLIDE ===== */
+        .code-slide-container {
+            background: #0f0f1f;
+            border-radius: 12px;
+            border: 1px solid #2a3a6a;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        .slide-label-container {
+            background: #2e2e42;
+            padding: 10px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #1a1a2e;
+        }
+
+        .slide-label {
+            color: #00d2ff;
+            font-size: 0.85rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .code-output-area {
+            min-height: 450px;
+            padding: 16px;
+            color: #a8ffb2;
+            font-family: 'Consolas', 'Courier New', monospace;
+            font-size: 0.85rem;
+            overflow: auto;
+            white-space: pre;
+            background: #050510;
+            border: none;
+            outline: none;
+            resize: vertical;
+            width: 100%;
+        }
+
+        /* ===== LIVE PREVIEW ===== */
+        .preview-slide-full {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+            display: flex;
+            flex-direction: column;
+        }
+
+            .preview-slide-full iframe {
+                min-height: 500px;
+                width: 100%;
+                border: none;
+                background: #ffffff;
+                flex: 1;
+            }
+
+        #selectionLabel {
+            font-size: 0.8rem;
+            color: #ffd700;
+            font-weight: bold;
+        }
+
+        /* Toast Alert System */
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #00b4db;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 8px;
+            z-index: 100;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: 0.3s;
+            pointer-events: none;
+            font-weight: 500;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+
+            .toast.show {
+                opacity: 1;
+                transform: translateY(0);
+            }
+
+        .preview-slide-full:fullscreen {
+            border-radius: 0;
+            padding: 0;
+            width: 100vw;
+            height: 100vh;
+        }
+
+            .preview-slide-full:fullscreen iframe {
+                height: calc(100vh - 45px);
+            }
+
+        @media (max-width: 768px) {
+            .text-toolbar .group {
+                border-right: none;
+                padding-right: 0;
+                margin-right: 0;
+                margin-bottom: 4px;
+                width: 100%;
+            }
+
+            .action-bar .btn {
+                flex: 1;
+                width: 100%;
+            }
+        }
+
+
+        /* =======================================
+        ROOT_NAMA CLASS_YUSUF STYLING
+        ======================================= */
+        .yusuf-footer {
+            background-color: #0c1622; /* Footer cerah */
+            padding: 40px 0;
+            width: 100%;
+            border-top: 2px solid #1b263b;
+            position: relative;
+            z-index: 10;
+            overflow: hidden;
+            transition: background-color 0.8s ease, border-color 0.8s ease;
+        }
+
+        body.yusuf-storm-active .yusuf-footer {
+            background-color: #020304; /* Footer saat badai */
+            border-top-color: #11141a;
+        }
+
+        .yusuf-footer-container {
+            position: relative;
+            max-width: 1200px;
+            margin: 0 auto;
+            text-align: center;
+            z-index: 12;
+        }
+
+        .yusuf-copyright-text {
+            color: #8da9c4;
+            font-size: 1rem;
+            letter-spacing: 1px;
+            transition: color 0.8s ease;
+        }
+
+        body.yusuf-storm-active .yusuf-copyright-text {
+            color: #5f6470;
+        }
+
+        .yusuf-storm-trigger {
+            color: #e0e1dd; /* Warna text awal saat cerah */
+            text-decoration: none;
+            font-weight: bold;
+            position: relative;
+            transition: color 0.4s ease, text-shadow 0.4s ease;
+            display: inline-block;
+        }
+
+            .yusuf-storm-trigger:hover {
+                color: #00fff2;
+            }
+
+        /* EFEK KILATAN FLASH DI TANAH */
+        .yusuf-ground-flash {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(ellipse at top, rgba(0, 255, 242, 0.4) 0%, transparent 70%);
+            opacity: 0;
+            z-index: 11;
+            pointer-events: none;
+        }
+
+            .yusuf-ground-flash.flash-active {
+                animation: flashGround 0.25s ease-out forwards;
+            }
+
+        @keyframes flashGround {
+            0%, 100% {
+                opacity: 0;
+            }
+
+            20%, 60% {
+                opacity: 1;
+            }
+        }
+
+        /* RETAKAN TANAH */
+        .yusuf-ground-cracks {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #00fff2;
+            opacity: 0;
+            z-index: 11;
+            pointer-events: none;
+            filter: blur(0.5px) drop-shadow(0 0 8px #00fff2);
+            clip-path: polygon( 45% 0%, 47% 15%, 43% 30%, 48% 50%, 42% 70%, 46% 100%, 45% 100%, 41% 72%, 46% 51%, 41% 32%, 45% 16%, 44% 0%,
+            /* Cabang Kiri */
+            43% 30%, 35% 45%, 38% 65%, 30% 85%, 31% 85%, 39% 64%, 36% 46%,
+            /* Cabang Kanan */
+            48% 50%, 58% 65%, 54% 85%, 65% 100%, 64% 100%, 53% 86%, 57% 66% );
+        }
+
+            .yusuf-ground-cracks.cracks-active {
+                animation: crackGlow 0.4s ease-out forwards;
+            }
+
+        @keyframes crackGlow {
+            0% {
+                opacity: 0;
+                filter: brightness(0.5) blur(1px);
+            }
+
+            15%, 45% {
+                opacity: 1;
+                filter: brightness(2) blur(0px);
+            }
+
+            100% {
+                opacity: 0;
+                filter: brightness(0.2) blur(2px);
+            }
+        }
+
+        /* =======================================
+        WADAH ANIMASI BADAI (HIDDEN BY DEFAULT)
+        ======================================= */
+        .yusuf-storm-wrapper {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 5;
+            opacity: 0;
+            transition: opacity 0.8s ease;
+        }
+
+            .yusuf-storm-wrapper.active {
+                opacity: 1;
+            }
+
+            .yusuf-storm-wrapper.ambient-flash {
+                animation: skyFlash 0.3s ease-out;
+            }
+
+        @keyframes skyFlash {
+            0%, 100% {
+                background-color: transparent;
+            }
+
+            25%, 65% {
+                background-color: rgba(255, 255, 255, 0.15);
+            }
+        }
+
+        /* AWAN BERJALAN */
+        .yusuf-cloud-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 250px;
+            overflow: hidden;
+        }
+
+        .yusuf-cloud-layer {
+            position: absolute;
+            width: 200%;
+            height: 100%;
+            background: repeat-x url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Cpath d='M10 80 C 20 60, 40 60, 50 70 C 60 50, 80 50, 90 75 C 95 65, 105 70, 100 85 Z' fill='%23181d26' opacity='0.85'/%3E%3C/svg%3E");
+            background-size: 300px 150px;
+            filter: blur(8px);
+        }
+
+        .yusuf-cloud-1 {
+            top: -20px;
+            animation: moveClouds 40s linear infinite;
+        }
+
+        .yusuf-cloud-2 {
+            top: 10px;
+            background-size: 450px 200px;
+            opacity: 0.6;
+            animation: moveClouds 25s linear infinite reverse;
+        }
+
+        @keyframes moveClouds {
+            0% {
+                transform: translateX(0);
+            }
+
+            100% {
+                transform: translateX(-50%);
+            }
+        }
+
+        /* HUJAN */
+        .yusuf-rain-container {
+            position: absolute;
+            top: 120px;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        .yusuf-drop {
+            position: absolute;
+            background: linear-gradient(transparent, rgba(0, 255, 242, 0.4));
+            width: 1.2px;
+            height: 30px;
+            animation: fall 0.6s linear infinite;
+        }
+
+        @keyframes fall {
+            0% {
+                transform: translateY(-50px) rotate(15deg);
+            }
+
+            100% {
+                transform: translateY(100vh) rotate(15deg);
+            }
+        }
+
+        /* CANVAS PETIR */
+        .yusuf-lightning-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        /* EFEK GEMPA */
+        .shake-body {
+            animation: hardShake 0.15s linear 2;
+        }
+
+        @keyframes hardShake {
+            0% {
+                transform: translate(2px, 1px) rotate(0deg);
+            }
+
+            50% {
+                transform: translate(-2px, -3px) rotate(-0.1deg);
+            }
+
+            100% {
+                transform: translate(1px, 2px) rotate(0.1deg);
+            }
+        }
+
+        /* --- CLASS CUSTOM --- */
+        .root_nama {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            display: inline-block;
+            z-index: 1000;
+        }
+
+        .clas_yusuf {
+            background-color: #1e3a8a;
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            font-weight: bold;
+            font-family: 'Poppins', sans-serif;
+            position: relative;
+            z-index: 1010;
+            transition: background 0.2s, transform 0.1s;
+            box-shadow: 0 4px 15px rgba(30, 58, 138, 0.4);
+        }
+
+            .clas_yusuf:active {
+                transform: scale(0.95);
+            }
+
+        /* --- CONTAINER HUJAN UANG FULL SCREEN --- */
+        #moneyRainContainer {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            pointer-events: none;
+            z-index: 999;
+            overflow: hidden;
+            display: none;
+        }
+
+        .money-item {
+            position: absolute;
+            top: -50px;
+            pointer-events: none;
+            user-select: none;
+        }
+
+        .bill-animation {
+            animation: fallAndWave 3.5s ease-in-out infinite;
+        }
+
+        .coin-animation {
+            animation: fallAndSpinCoin 2.8s linear infinite;
+        }
+
+        @keyframes fallAndWave {
+            0% {
+                transform: translateY(0) translateX(0) rotate(0deg);
+                opacity: 1;
+            }
+
+            25% {
+                transform: translateY(25vh) translateX(25px) rotate(12deg);
+            }
+
+            50% {
+                transform: translateY(50vh) translateX(-25px) rotate(-12deg);
+            }
+
+            75% {
+                transform: translateY(75vh) translateX(15px) rotate(8deg);
+            }
+
+            100% {
+                transform: translateY(105vh) translateX(-5px) rotate(0deg);
+                opacity: 0.3;
+            }
+        }
+
+        @keyframes fallAndSpinCoin {
+            0% {
+                transform: translateY(0) rotateY(0deg);
+                opacity: 1;
+            }
+
+            100% {
+                transform: translateY(105vh) rotateY(540deg);
+                opacity: 0.4;
+            }
+        }
+
+        /* --- SCENE UTAMA (Awan, Matahari, Canvas) --- */
+        #skyScene {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            pointer-events: none;
+            z-index: 996;
+            display: none;
+        }
+
+        .fancy-cloud {
+            position: absolute;
+            top: 2.5rem;
+            left: 2.5rem;
+            width: 160px;
+            height: 55px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 50px;
+            filter: drop-shadow(0 8px 15px rgba(0,0,0,0.1));
+            animation: floatCloud 4s ease-in-out infinite alternate;
+            z-index: 998;
+        }
+
+            .fancy-cloud::before, .fancy-cloud::after {
+                content: '';
+                position: absolute;
+                background: inherit;
+                border-radius: 50%;
+            }
+
+            .fancy-cloud::before {
+                width: 75px;
+                height: 75px;
+                top: -38px;
+                left: 25px;
+            }
+
+            .fancy-cloud::after {
+                width: 95px;
+                height: 95px;
+                top: -55px;
+                left: 55px;
+            }
+
+        .bright-sun {
+            position: absolute;
+            top: 1.5rem;
+            left: 4.5rem;
+            width: 85px;
+            height: 85px;
+            background: radial-gradient(circle, #fff385 0%, #f6e05e 100%);
+            border-radius: 50%;
+            box-shadow: 0 0 50px rgba(246, 224, 94, 0.7);
+            z-index: 997;
+            animation: sunPulse 3s ease-in-out infinite;
+        }
+
+        @keyframes floatCloud {
+            0% {
+                transform: translateY(0);
+            }
+
+            100% {
+                transform: translateY(-8px);
+            }
+        }
+
+        @keyframes sunPulse {
+            0%, 100% {
+                transform: scale(1);
+                opacity: 0.85;
+            }
+
+            50% {
+                transform: scale(1.06);
+                opacity: 1;
+                box-shadow: 0 0 65px rgba(246, 224, 94, 0.9);
+            }
+        }
+
+        #rainbowCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 996;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+
+    <header class="header">
+        <h1>⚡ Multi Table Designer Ultimate Pro</h1>
+        <small>Premium WYSIWYG Editor Konten, Manajemen Struktur Tabel, & File Bundler [Offline Ultimate Edition]</small>
+    </header>
+
+    <nav class="tab-nav">
+        <button class="active" data-tab="workspace">🛠️ 1. Workspace Desain</button>
+        <button data-tab="code" onclick="runConversion()">💻 2. Source Code</button>
+        <button data-tab="preview" onclick="runConversion()">👁️ 3. Live Preview (Full)</button>
+    </nav>
+
+    <div class="tab-container">
+        <div class="tab-panel active" id="panel-workspace">
+            <div class="workspace-sub-nav">
+                <button class="active" id="btnSubText" onclick="switchWorkspaceSub('text')">📄 Desain Teks</button>
+                <button id="btnSubTable" onclick="switchWorkspaceSub('table')">📊 Desain Tabel</button>
+                <button id="btnSubUpload" onclick="switchWorkspaceSub('upload')">📎 Upload File</button>
+            </div>
+
+            <div class="workspace-slide-container">
+                <div class="workspace-slide active" id="sub-workspace-text">
+                    <div class="panel-title">📄 Desain Konten & Teks Dokumen (Gaya Microsoft Word)</div>
+                    <div class="text-editor-wrapper">
+                        <div class="text-toolbar">
+                            <div class="group">
+                                <button onclick="document.getElementById('importDocText').click()" style="color:#0083b0; font-weight:bold; background: #e0f2fe; border: 1px solid #7dd3fc;" title="Ekstrak teks dari file secara langsung">📥 Import Teks (DOCX, PDF, TXT)</button>
+                                <input type="file" id="importDocText" accept=".txt,.docx,.doc,.pdf" style="display:none;" onchange="processTextImport(event)">
+                            </div>
+
+                            <div class="group">
+                                <button onclick="insertWysiwygTable()" style="color:#11998e;" title="Sisipkan Tabel ke dalam teks">🔲 Tabel Baru</button>
+                                <button onclick="toggleWysiwygTableBorder()" style="color:#f7971e;" title="Letakkan kursor di dalam tabel lalu klik untuk membuat border transparan">👻 Border Tembus</button>
+                            </div>
+                            <div class="group">
+                                <select onchange="execStyleArg('fontName', this.value)">
+                                    <option value="Segoe UI">Segoe UI</option>
+                                    <option value="Arial">Arial</option>
+                                    <option value="Times New Roman">Times New Roman</option>
+                                    <option value="Courier New">Courier New</option>
+                                    <option value="Georgia">Georgia</option>
+                                    <option value="Impact">Impact</option>
+                                    <option value="Trebuchet MS">Trebuchet MS</option>
+                                </select>
+                                <select onchange="execStyleArg('fontSize', this.value)">
+                                    <option value="3">12pt (Normal)</option>
+                                    <option value="1">8pt</option>
+                                    <option value="2">10pt</option>
+                                    <option value="4">14pt</option>
+                                    <option value="5">18pt</option>
+                                    <option value="6">24pt</option>
+                                    <option value="7">36pt</option>
+                                </select>
+                            </div>
+                            <div class="group">
+                                <button onclick="execStyle('bold')" title="Bold"><b>B</b></button>
+                                <button onclick="execStyle('italic')" title="Italic"><i>I</i></button>
+                                <button onclick="execStyle('underline')" title="Underline"><u>U</u></button>
+                                <button onclick="execStyle('strikeThrough')" title="Strikethrough"><s>S</s></button>
+                            </div>
+                            <div class="group">
+                                <button onclick="execStyle('subscript')">X<sub>2</sub></button>
+                                <button onclick="execStyle('superscript')">X<sup>2</sup></button>
+                                <button onclick="execStyleArg('formatBlock', '<h1>')"><b>H1</b></button>
+                                <button onclick="execStyleArg('formatBlock', '<h2>')"><b>H2</b></button>
+                                <button onclick="execStyleArg('formatBlock', '<h3>')"><b>H3</b></button>
+                                <button onclick="execStyleArg('formatBlock', '<p>')">¶</button>
+                            </div>
+                            <div class="group">
+                                <button onclick="execStyle('justifyLeft')">Kiri</button>
+                                <button onclick="execStyle('justifyCenter')">Tengah</button>
+                                <button onclick="execStyle('justifyRight')">Kanan</button>
+                                <button onclick="execStyle('justifyFull')">Justify</button>
+                            </div>
+                            <div class="group">
+                                <button onclick="execStyle('insertUnorderedList')">• Bullet</button>
+                                <button onclick="execStyle('insertOrderedList')">1. Num</button>
+                                <button onclick="insertHorizontalRule()">— Garis</button>
+                            </div>
+                            <div class="group">
+                                <label style="color:#334155; font-size:0.75rem; display:flex; align-items:center; gap:4px;">Teks: <input type="color" onchange="execStyleArg('foreColor', this.value)" value="#1e293b"></label>
+                                <label style="color:#334155; font-size:0.75rem; display:flex; align-items:center; gap:4px;">Bg: <input type="color" onchange="execStyleArg('hiliteColor', this.value)" value="#ffffff"></label>
+                                <button onclick="insertAnchorLink()" style="color:#3a7bd5;">🔗 Link</button>
+                                <button onclick="execStyle('removeFormat')" style="color: #eb3349;">🧹 Hapus</button>
+                            </div>
+                        </div>
+                        <div class="wysiwyg-editor" id="textVisualEditor" contenteditable="true"></div>
+                    </div>
+                </div>
+
+                <div class="workspace-slide" id="sub-workspace-table">
+                    <div class="panel-title">📊 Struktur Multi-Tabel Berkinerja Tinggi & Desain Kustom</div>
+
+                    <div class="table-list" id="tableTabContainer"></div>
+
+                    <div class="controls-grid">
+                        <div class="control-row">
+                            <button onclick="addNewTableInstance()" class="btn-mini btn-success">➕ Tambah Tabel Baru</button>
+                            <span style="color:#2a3a6a">|</span>
+                            <label>Brs:</label><input type="number" id="inputRows" value="5" min="1" style="width:45px;">
+                            <label>Kol:</label><input type="number" id="inputCols" value="5" min="1" style="width:45px;">
+                            <button onclick="resizeGridDimensions()" class="btn-mini btn-primary">Set Ulang</button>
+                        </div>
+
+                        <div class="control-row">
+                            <label>⚡ Brs:</label>
+                            <button onclick="insertRowDynamic()" class="btn-mini btn-success">➕ Tambah</button>
+                            <button onclick="deleteRowDynamic()" class="btn-mini btn-danger">➖ Hapus</button>
+                            <span style="color:#2a3a6a">|</span>
+                            <label>⚡ Kol:</label>
+                            <button onclick="insertColDynamic()" class="btn-mini btn-success">➕ Tambah</button>
+                            <button onclick="deleteColDynamic()" class="btn-mini btn-danger">➖ Hapus</button>
+                        </div>
+
+                        <div class="control-row">
+                            <button onclick="executeMergeCells()" class="btn-mini btn-primary">Merge Cells</button>
+                            <button onclick="executeUnmergeCells()" class="btn-mini btn-danger">Unmerge</button>
+                            <span id="selectionLabel">Sel: Tidak ada seleksi</span>
+                        </div>
+
+                        <div class="control-row">
+                            <label>Brs Indeks:</label><input type="number" id="manualRowIndex" value="1" style="width:45px;">
+                            <label>Tinggi:</label><input type="number" id="manualRowHeight" value="35" style="width:50px;">
+                            <label>Kol Indeks:</label><input type="number" id="manualColIndex" value="1" style="width:45px;">
+                            <label>Lebar:</label><input type="number" id="manualColWidth" value="100" style="width:50px;">
+                            <button onclick="applyManualSizes()" class="btn-mini btn-warning">Terapkan</button>
+                        </div>
+
+                        <div class="control-row">
+                            <label>🎨 Tema Tabel:</label>
+                            <select id="tableThemeSelect" onchange="applyTableThemePreset(this.value)">
+                                <option value="default">Klasik (Abu-Abu)</option>
+                                <option value="modern-blue">Modern Blue</option>
+                                <option value="emerald-green">Emerald Green</option>
+                                <option value="luxury-dark">Luxury Dark</option>
+                            </select>
+                            <span style="color:#2a3a6a">|</span>
+                            <label>Warna Sel Seleksi:</label>
+                            <input type="color" id="cellBgCustomInput" value="#ffffff" onchange="applyCustomCellBg(this.value)">
+                        </div>
+                    </div>
+
+                    <div class="table-viewport" id="tableGridContainer">
+                        <table class="designer-table" id="mainGridTable">
+                            <tbody id="mainGridBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="workspace-slide" id="sub-workspace-upload">
+                    <div class="panel-title">📎 Upload Lampiran (Gambar & Dokumen)</div>
+                    <p style="font-size: 0.85rem; color: #a0aec0; margin-bottom: 10px;">
+                        File yang di-upload akan dikonversi ke sistem Base64 sehingga menyatu di dalam kode HTML tunggal. Gambar akan tampil, sedangkan file Doc/Excel akan menjadi tombol Download.
+                    </p>
+
+                    <div class="upload-zone" id="dropZone" onclick="document.getElementById('fileUploader').click()">
+                        <input type="file" id="fileUploader" multiple accept=".jpg,.jpeg,.png,.gif,.doc,.docx,.xls,.xlsx,.pdf" style="display:none;" onchange="handleFileUpload(event)">
+                        <div style="font-size: 2.5rem;">📥</div>
+                        <p>Klik atau Seret file (Drag & Drop) ke area ini</p>
+                        <small>Mendukung: JPG, PNG, GIF, DOC, DOCX, XLS, XLSX, PDF</small>
+                    </div>
+
+                    <div class="file-list-container" id="uploadedFileList">
+                    </div>
+                </div>
+            </div>
+
+            <div class="action-bar">
+                <button class="btn btn-primary" onclick="runConversion(); showToast('Proses Berhasil! Silakan cek slide 2 & 3.');">🚀 Proses & Bundling Desain</button>
+                <button class="btn btn-warning" onclick="saveProjectOffline()">💾 Simpan Proyek (JSON)</button>
+                <button class="btn btn-success" onclick="document.getElementById('projectLoader').click()">📂 Muat Proyek</button>
+                <input type="file" id="projectLoader" accept=".json" style="display:none;" onchange="loadProjectOffline(event)">
+                <button class="btn btn-danger" onclick="resetWorkspaceData()">🗑️ Reset Konten</button>
+            </div>
+        </div>
+
+        <div class="tab-panel" id="panel-code">
+            <div class="code-slide-container">
+                <div class="slide-label-container">
+                    <div class="slide-label">Kode Source Ter-generate (HTML + CSS + JS Lengkap - Offline Support)</div>
+                    <div>
+                        <button class="btn-mini btn-warning" onclick="downloadHTMLFile()">📥 Download .HTML</button>
+                        <button class="btn-mini btn-primary" onclick="copyGeneratedCode()">📋 Copy Code</button>
+                    </div>
+                </div>
+                <textarea class="code-output-area" id="codeOutputBox" placeholder="Belum diproses. Selesaikan desain lalu klik bundling."></textarea>
+            </div>
+        </div>
+
+        <div class="tab-panel" id="panel-preview">
+            <div class="preview-slide-full" id="previewContainer">
+                <div class="slide-label-container" style="background:#11998e;">
+                    <div class="slide-label" style="color:white;">Live Preview Render Hasil Desain</div>
+                    <button class="btn-mini btn-warning" onclick="toggleFullScreenPreview()">🖥️ Full Screen</button>
+                </div>
+                <iframe id="livePreviewIframe"></iframe>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast" id="toastBox">Tersimpan!</div>
+
+
+    <div id="storm-wrapper" class="yusuf-storm-wrapper">
+        <div class="yusuf-cloud-container">
+            <div class="yusuf-cloud-layer yusuf-cloud-1"></div>
+            <div class="yusuf-cloud-layer yusuf-cloud-2"></div>
+        </div>
+
+        <div id="rain-container" class="yusuf-rain-container"></div>
+
+        <canvas id="lightning-canvas" class="yusuf-lightning-canvas"></canvas>
+    </div>
+
+
+    <div id="skyScene">
+        <div class="bright-sun"></div>
+        <div class="fancy-cloud"></div>
+        <canvas id="rainbowCanvas"></canvas>
+    </div>
+
+    <div id="moneyRainContainer"></div>
+
+    <div class="root_nama">
+        <button id="openDonateBtn" class="clas_yusuf">
+            ❤️ Donate
+        </button>
+    </div>
+
+    <div id="donateModal" style="display: none; position: fixed; z-index: 9999; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.6); justify-content: center; align-items: center;">
+        <div style="background-color: white; color: #333; padding: 2rem; border-radius: 1rem; max-width: 450px; width: 90%; text-align: center; position: relative; box-shadow: 0 10px 25px rgba(0,0,0,0.2);">
+            <span id="closeDonateBtn" style="position: absolute; right: 1.5rem; top: 1rem; font-size: 1.8rem; cursor: pointer; color: #a1a1aa;">&times;</span>
+            <h3 style="margin-top: 0; color: #1e3a8a; font-weight: 700;">Terima Kasih Banyak</h3>
+            <p style="font-style: italic; color: #4b5563; font-size: 1rem; line-height: 1.6;">
+                "Kehadiran Anda adalah energi bagi kami untuk terus berkarya. Terima kasih telah menggunakan aplikasi ini, dan ketulusan hati Anda melalui donasi ini sangat berarti dalam membantu kami menjaga aplikasi ini tetap hidup dan berkembang."
+            </p>
+            <hr style="border: 0; border-top: 2px solid #e5e7eb; margin: 2rem 0;">
+            <p style="font-weight: bold; margin-bottom: 0.75rem; color: #1f2937; font-size: 1.1rem;">Scan Barcode Paypal untuk Berdonasi</p>
+            <div style="background-color: #f3f4f6; padding: 1.5rem; border-radius: 1rem; display: inline-block;">
+                <img src="assets/img/qris-paypal.png" alt="QRIS Yusuf Ibrahim Malik Dev" style=" height: 350px; object-fit: contain; display: block; margin: 0 auto;">
+            </div>
+            <p style="margin-top: 1rem; font-size: 1rem; color: #374151;">Atas Nama: <br><strong style="font-size: 1.25rem; color: #111827;">Yusuf Ibrahim Malik Dev</strong></p>
+        </div>
+    </div>
+
+
+    <footer class="yusuf-footer">
+        <div id="ground-cracks" class="yusuf-ground-cracks"></div>
+        <div id="ground-flash" class="yusuf-ground-flash"></div>
+
+        <div class="yusuf-footer-container">
+            <p class="yusuf-copyright-text">
+                &copy; 2026
+                <a href="https://github.com/Yusuf-Ibrahim-Malik-Dev" target="_blank" rel="noopener noreferrer" class="yusuf-storm-trigger">
+                    Yusuf Ibrahim Malik Dev
+                </a>.
+                All Rights Reserved.
+            </p>
+        </div>
+    </footer>
+
+    <script>
+        // State Management Global
+        let datasetTables = [];
+        let activeTableIdx = 0;
+        let isMouseDownSelection = false;
+        let startSelectRow = null, startSelectCol = null;
+        let endSelectRow = null, endSelectCol = null;
+        let finalGeneratedCode = "";
+
+        // Data Base64 untuk Upload File
+        let uploadedFilesData = [];
+
+        // ===== FUNGSI BARU IMPORT TEKS & EKSTRAKSI (DOCX, PDF, TXT) =====
+        async function processTextImport(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            showToast("Mengekstrak dokumen, mohon tunggu...");
+            const ext = file.name.split('.').pop().toLowerCase();
+            const editor = document.getElementById('textVisualEditor');
+
+            try {
+                if (ext === 'txt') {
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        editor.innerHTML += `<p>${e.target.result.replace(/\n/g, '<br>')}</p>`;
+                        showToast("Teks berhasil diekstrak!");
+                    };
+                    reader.readAsText(file);
+                }
+                else if (ext === 'docx') {
+                    const reader = new FileReader();
+                    reader.onload = function (e) {
+                        mammoth.convertToHtml({ arrayBuffer: e.target.result })
+                            .then(function (result) {
+                                editor.innerHTML += result.value;
+                                showToast("DOCX berhasil diekstrak!");
+                            }).catch(err => {
+                                console.error(err);
+                                showToast("Gagal membaca DOCX");
+                            });
+                    };
+                    reader.readAsArrayBuffer(file);
+                }
+                else if (ext === 'pdf') {
+                    const reader = new FileReader();
+                    reader.onload = async function (e) {
+                        try {
+                            const typedarray = new Uint8Array(e.target.result);
+                            const pdf = await pdfjsLib.getDocument(typedarray).promise;
+                            let fullText = "";
+                            for (let i = 1; i <= pdf.numPages; i++) {
+                                const page = await pdf.getPage(i);
+                                const textContent = await page.getTextContent();
+                                const pageText = textContent.items.map(item => item.str).join(' ');
+                                fullText += `<p>${pageText}</p>`;
+                            }
+                            editor.innerHTML += fullText;
+                            showToast("PDF berhasil diekstrak!");
+                        } catch (err) {
+                            console.error(err);
+                            showToast("Gagal membaca PDF");
+                        }
+                    };
+                    reader.readAsArrayBuffer(file);
+                }
+                else if (ext === 'doc') {
+                    alert("Gunakan format .docx untuk mengekstrak teks.");
+                    showToast("Gagal. Harap gunakan DOCX.");
+                }
+            } catch (error) {
+                console.error(error);
+                showToast("Terjadi kesalahan sistem saat mengekstrak.");
+            }
+            event.target.value = "";
+        }
+        // =================================================================
+
+        // ===== TAMBAHAN: FUNGSI TABEL INLINE WYSIWYG =====
+        function insertWysiwygTable() {
+            const rows = prompt("Masukkan jumlah Baris:", "3");
+            const cols = prompt("Masukkan jumlah Kolom:", "3");
+
+            if (!rows || !cols || isNaN(rows) || isNaN(cols)) return;
+
+            let tableHTML = '<table style="width:100%; border-collapse: collapse; border: 1px solid #cbd5e1; margin-bottom: 15px;"><tbody>';
+            for (let r = 0; r < rows; r++) {
+                tableHTML += '<tr>';
+                for (let c = 0; c < cols; c++) {
+                    tableHTML += '<td style="border: 1px solid #cbd5e1; padding: 8px;"></td>';
+                }
+                tableHTML += '</tr>';
+            }
+            tableHTML += '</tbody></table><p><br></p>';
+
+            document.execCommand('insertHTML', false, tableHTML);
+            showToast(`Tabel ${rows}x${cols} berhasil disisipkan!`);
+        }
+
+        function toggleWysiwygTableBorder() {
+            const selection = window.getSelection();
+            if (selection.rangeCount > 0) {
+                let node = selection.anchorNode;
+                // Cari node parent terdekat yang merupakan tabel
+                while (node && node.id !== 'textVisualEditor') {
+                    if (node.nodeName === 'TABLE') {
+                        // Cek apakah tabel sedang memiliki garis (atau garis default)
+                        const isTransparent = (node.style.borderColor === 'transparent');
+                        const newColor = isTransparent ? '#cbd5e1' : 'transparent';
+
+                        // Ubah border pembungkus tabel
+                        node.style.borderColor = newColor;
+
+                        // Ubah border semua sel di dalam tabel tersebut
+                        const cells = node.querySelectorAll('td, th');
+                        cells.forEach(cell => {
+                            cell.style.borderColor = newColor;
+                        });
+
+                        showToast(isTransparent ? "Garis Tabel diaktifkan" : "Garis Tabel menjadi transparan");
+                        return;
+                    }
+                    node = node.parentNode;
+                }
+                showToast("Letakkan kursor ketik di dalam tabel terlebih dahulu!");
+            }
+        }
+        // =================================================
+
+        // Fungsi Membantu WYSIWYG
+        function execStyle(cmd) { document.execCommand(cmd, false, null); }
+        function execStyleArg(cmd, arg) { document.execCommand(cmd, false, arg); }
+        function insertHorizontalRule() { document.execCommand('insertHorizontalRule', false, null); }
+        function insertAnchorLink() {
+            let url = prompt("Masukkan URL Link (misal: https://google.com):", "https://");
+            if (url) document.execCommand('createLink', false, url);
+        }
+
+        function showToast(msg) {
+            const box = document.getElementById('toastBox');
+            box.textContent = msg; box.classList.add('show');
+            setTimeout(() => box.classList.remove('show'), 2000);
+        }
+
+        // Fitur Copy & Full Screen
+        function copyGeneratedCode() {
+            const codeToCopy = document.getElementById('codeOutputBox').value;
+            if (!codeToCopy || codeToCopy.startsWith("Belum diproses")) return showToast("Belum ada kode!");
+            navigator.clipboard.writeText(codeToCopy).then(() => showToast("Kode disalin! 📋"));
+        }
+
+        function downloadHTMLFile() {
+            const codeToCopy = document.getElementById('codeOutputBox').value;
+            if (!codeToCopy || codeToCopy.startsWith("Belum diproses")) return showToast("Belum ada kode untuk diunduh!");
+            const blob = new Blob([codeToCopy], { type: "text/html;charset=utf-8" });
+            const a = document.createElement("a");
+            a.href = URL.createObjectURL(blob);
+            a.download = "Bundled_Document_" + Date.now() + ".html";
+            a.click();
+            showToast("File HTML terunduh!");
+        }
+
+        function toggleFullScreenPreview() {
+            const previewCont = document.getElementById('previewContainer');
+            if (!document.fullscreenElement) previewCont.requestFullscreen();
+            else document.exitFullscreen();
+        }
+
+        document.getElementById('codeOutputBox').addEventListener('input', function () {
+            finalGeneratedCode = this.value;
+            document.getElementById('livePreviewIframe').srcdoc = finalGeneratedCode;
+        });
+
+        document.querySelectorAll('.tab-nav button').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.tab-nav button').forEach(b => b.classList.remove('active'));
+                document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+                btn.classList.add('active');
+                document.getElementById('panel-' + btn.dataset.tab).classList.add('active');
+            });
+        });
+
+        function switchWorkspaceSub(target) {
+            document.getElementById('btnSubText').classList.toggle('active', target === 'text');
+            document.getElementById('btnSubTable').classList.toggle('active', target === 'table');
+            document.getElementById('btnSubUpload').classList.toggle('active', target === 'upload');
+            document.getElementById('sub-workspace-text').classList.toggle('active', target === 'text');
+            document.getElementById('sub-workspace-table').classList.toggle('active', target === 'table');
+            document.getElementById('sub-workspace-upload').classList.toggle('active', target === 'upload');
+        }
+
+        /* ================= FILE UPLOAD LOGIC ================= */
+        const dropZone = document.getElementById('dropZone');
+        dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.style.borderColor = '#00d2ff'; });
+        dropZone.addEventListener('dragleave', () => { dropZone.style.borderColor = '#4a7ad5'; });
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault(); dropZone.style.borderColor = '#4a7ad5';
+            processFiles(e.dataTransfer.files);
+        });
+
+        function handleFileUpload(event) {
+            processFiles(event.target.files);
+        }
+
+        function processFiles(files) {
+            for (let file of files) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    const base64Data = e.target.result;
+                    const isImg = file.type.startsWith('image/');
+
+                    uploadedFilesData.push({
+                        name: file.name,
+                        type: file.type,
+                        size: (file.size / 1024).toFixed(1) + ' KB',
+                        isImage: isImg,
+                        dataURI: base64Data
+                    });
+                    renderFileList();
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function renderFileList() {
+            const container = document.getElementById('uploadedFileList');
+            container.innerHTML = '';
+            uploadedFilesData.forEach((file, idx) => {
+                const isDoc = file.name.endsWith('.doc') || file.name.endsWith('.docx');
+                const isExcel = file.name.endsWith('.xls') || file.name.endsWith('.xlsx');
+                const isPdf = file.name.endsWith('.pdf');
+                let icon = '📄';
+                if (isDoc) icon = '📘 Word';
+                if (isExcel) icon = '📗 Excel';
+                if (isPdf) icon = '📕 PDF';
+
+                container.innerHTML += `
+                            <div class="file-item">
+                                <button class="btn-remove" onclick="removeFile(${idx}, event)">X</button>
+                                <div class="file-preview">
+                                    ${file.isImage ? `<img src="${file.dataURI}" alt="preview">` : icon}
+                                </div>
+                                <div class="file-name" title="${file.name}">${file.name}</div>
+                                <div style="font-size:0.65rem; color:#888; text-align:center;">${file.size}</div>
+                            </div>
+                        `;
+            });
+        }
+
+        function removeFile(index, event) {
+            event.stopPropagation();
+            uploadedFilesData.splice(index, 1);
+            renderFileList();
+        }
+
+        /* ================= TABLE LOGIC ================= */
+        function createFreshTableData(rows = 5, cols = 5) {
+            let matrix = [], mergeMap = [], customBgMap = [];
+            for (let r = 0; r < rows; r++) {
+                let rRow = [], mRow = [], bRow = [];
+                for (let c = 0; c < cols; c++) {
+                    rRow.push(`Sel ${r + 1}-${c + 1}`);
+                    mRow.push({ rowspan: 1, colspan: 1, isHidden: false });
+                    bRow.push('');
+                }
+                matrix.push(rRow); mergeMap.push(mRow); customBgMap.push(bRow);
+            }
+            return {
+                matrix,
+                mergeMap,
+                customBgMap,
+                rowHeights: new Array(rows).fill(35),
+                colWidths: new Array(cols).fill(100),
+                theme: 'default'
+            };
+        }
+
+        function renderActiveGrid() {
+            const currentTable = datasetTables[activeTableIdx];
+            if (!currentTable) return;
+
+            if (!currentTable.customBgMap) {
+                currentTable.customBgMap = currentTable.matrix.map(row => row.map(() => ''));
+            }
+            if (!currentTable.theme) currentTable.theme = 'default';
+
+            const body = document.getElementById('mainGridBody');
+            body.innerHTML = '';
+
+            currentTable.matrix.forEach((rowData, rIdx) => {
+                const tr = document.createElement('tr');
+                tr.style.height = currentTable.rowHeights[rIdx] + 'px';
+
+                rowData.forEach((cellValue, cIdx) => {
+                    const info = currentTable.mergeMap[rIdx][cIdx];
+                    if (info && info.isHidden) return;
+
+                    const td = document.createElement('td');
+                    td.dataset.row = rIdx; td.dataset.col = cIdx;
+                    td.style.width = currentTable.colWidths[cIdx] + 'px';
+
+                    if (currentTable.customBgMap[rIdx][cIdx]) {
+                        td.style.backgroundColor = currentTable.customBgMap[rIdx][cIdx];
+                    }
+
+                    if (info) {
+                        if (info.rowspan > 1) td.setAttribute('rowspan', info.rowspan);
+                        if (info.colspan > 1) td.setAttribute('colspan', info.colspan);
+                    }
+
+                    const input = document.createElement('input');
+                    input.value = cellValue;
+                    input.addEventListener('input', (e) => currentTable.matrix[rIdx][cIdx] = e.target.value);
+
+                    td.appendChild(input);
+
+                    td.addEventListener('mousedown', (e) => {
+                        isMouseDownSelection = true;
+                        startSelectRow = rIdx; startSelectCol = cIdx;
+                        endSelectRow = rIdx; endSelectCol = cIdx;
+                        highlightGridSelection(rIdx, cIdx, rIdx, cIdx);
+                    });
+                    td.addEventListener('mouseenter', () => {
+                        if (isMouseDownSelection) {
+                            endSelectRow = rIdx; endSelectCol = cIdx;
+                            highlightGridSelection(startSelectRow, startSelectCol, rIdx, cIdx);
+                        }
+                    });
+                    tr.appendChild(td);
+                });
+                body.appendChild(tr);
+            });
+            document.getElementById('tableThemeSelect').value = currentTable.theme;
+            renderTabsControlList();
+        }
+
+        function highlightGridSelection(sR, sC, eR, eC) {
+            const minR = Math.min(sR, eR), maxR = Math.max(sR, eR), minC = Math.min(sC, eC), maxC = Math.max(sC, eC);
+            document.querySelectorAll('#mainGridTable td').forEach(td => {
+                const r = parseInt(td.dataset.row), c = parseInt(td.dataset.col);
+                if (r >= minR && r <= maxR && c >= minC && c <= maxC) td.classList.add('selected');
+                else td.classList.remove('selected');
+            });
+            document.getElementById('selectionLabel').textContent = `Terpilih: Brs ${minR + 1}-${maxR + 1} | Kol ${minC + 1}-${maxC + 1}`;
+        }
+        document.addEventListener('mouseup', () => isMouseDownSelection = false);
+
+        function insertRowDynamic() {
+            const t = datasetTables[activeTableIdx];
+            const colCount = t.colWidths.length;
+            t.matrix.push(new Array(colCount).fill(`Sel ${t.matrix.length + 1}-Baru`));
+            t.mergeMap.push(Array.from({ length: colCount }, () => ({ rowspan: 1, colspan: 1, isHidden: false })));
+            t.customBgMap.push(new Array(colCount).fill(''));
+            t.rowHeights.push(35);
+            renderActiveGrid();
+        }
+        function deleteRowDynamic() {
+            const t = datasetTables[activeTableIdx];
+            if (t.matrix.length <= 1) return showToast("Minimal 1 baris!");
+            t.matrix.pop(); t.mergeMap.pop(); t.customBgMap.pop(); t.rowHeights.pop(); renderActiveGrid();
+        }
+        function insertColDynamic() {
+            const t = datasetTables[activeTableIdx];
+            t.matrix.forEach((r, i) => r.push(`Sel ${i + 1}-Baru`));
+            t.mergeMap.forEach(m => m.push({ rowspan: 1, colspan: 1, isHidden: false }));
+            t.customBgMap.forEach(b => b.push(''));
+            t.colWidths.push(100); renderActiveGrid();
+        }
+        function deleteColDynamic() {
+            const t = datasetTables[activeTableIdx];
+            if (t.colWidths.length <= 1) return showToast("Minimal 1 kolom!");
+            t.matrix.forEach(r => r.pop()); t.mergeMap.forEach(m => m.pop()); t.customBgMap.forEach(b => b.pop()); t.colWidths.pop(); renderActiveGrid();
+        }
+        function resizeGridDimensions() {
+            const r = parseInt(document.getElementById('inputRows').value), c = parseInt(document.getElementById('inputCols').value);
+            if (r > 0 && c > 0) {
+                datasetTables[activeTableIdx] = createFreshTableData(r, c); renderActiveGrid();
+            }
+        }
+        function applyManualSizes() {
+            const t = datasetTables[activeTableIdx];
+            const rIdx = parseInt(document.getElementById('manualRowIndex').value) - 1, rH = parseInt(document.getElementById('manualRowHeight').value);
+            const cIdx = parseInt(document.getElementById('manualColIndex').value) - 1, cW = parseInt(document.getElementById('manualColWidth').value);
+            if (rIdx >= 0 && rIdx < t.rowHeights.length) t.rowHeights[rIdx] = rH;
+            if (cIdx >= 0 && cIdx < t.colWidths.length) t.colWidths[cIdx] = cW;
+            renderActiveGrid();
+        }
+
+        function applyCustomCellBg(color) {
+            const t = datasetTables[activeTableIdx];
+            const selected = document.querySelectorAll('#mainGridTable td.selected');
+            if (selected.length === 0) return showToast("Pilih sel terlebih dahulu!");
+            selected.forEach(td => {
+                const r = parseInt(td.dataset.row), c = parseInt(td.dataset.col);
+                t.customBgMap[r][c] = color;
+            });
+            renderActiveGrid();
+        }
+
+        function applyTableThemePreset(themeName) {
+            if (datasetTables[activeTableIdx]) {
+                datasetTables[activeTableIdx].theme = themeName;
+                showToast(`Tema ${themeName} diaplikasikan.`);
+            }
+        }
+
+        function executeMergeCells() {
+            const selected = document.querySelectorAll('#mainGridTable td.selected');
+            if (selected.length < 2) return showToast("Pilih minimal 2 kotak!");
+            let minR = Infinity, maxR = -Infinity, minC = Infinity, maxC = -Infinity;
+            selected.forEach(td => {
+                const r = parseInt(td.dataset.row), c = parseInt(td.dataset.col);
+                if (r < minR) minR = r; if (r > maxR) maxR = r; if (c < minC) minC = c; if (c > maxC) maxC = c;
+            });
+
+            const t = datasetTables[activeTableIdx];
+            for (let r = minR; r <= maxR; r++) {
+                for (let c = minC; c <= maxC; c++) {
+                    if (r === minR && c === minC) {
+                        t.mergeMap[r][c] = { rowspan: maxR - minR + 1, colspan: maxC - minC + 1, isHidden: false };
+                    } else {
+                        t.mergeMap[r][c] = { rowspan: 1, colspan: 1, isHidden: true };
+                    }
+                }
+            }
+            renderActiveGrid();
+        }
+        function executeUnmergeCells() {
+            const selected = document.querySelectorAll('#mainGridTable td.selected');
+            if (selected.length === 0) return showToast("Pilih sel yang di-merge!");
+            const t = datasetTables[activeTableIdx];
+            selected.forEach(td => {
+                const r = parseInt(td.dataset.row), c = parseInt(td.dataset.col);
+                t.mergeMap[r][c] = { rowspan: 1, colspan: 1, isHidden: false };
+            });
+            renderActiveGrid();
+        }
+
+        function renderTabsControlList() {
+            const c = document.getElementById('tableTabContainer'); c.innerHTML = '';
+            datasetTables.forEach((_, idx) => {
+                const btn = document.createElement('div');
+                btn.className = `table-tab ${idx === activeTableIdx ? 'active' : ''}`;
+                btn.innerHTML = `<span>Tabel ${idx + 1}</span>`;
+
+                if (datasetTables.length > 1) {
+                    const delBtn = document.createElement('button');
+                    delBtn.className = 'btn-close-tab';
+                    delBtn.textContent = '✕';
+                    delBtn.onclick = (e) => {
+                        e.stopPropagation();
+                        datasetTables.splice(idx, 1);
+                        activeTableIdx = 0;
+                        renderActiveGrid();
+                    };
+                    btn.appendChild(delBtn);
+                }
+
+                btn.onclick = () => { activeTableIdx = idx; renderActiveGrid(); };
+                c.appendChild(btn);
+            });
+        }
+        function addNewTableInstance() {
+            datasetTables.push(createFreshTableData(5, 5));
+            activeTableIdx = datasetTables.length - 1;
+            renderActiveGrid();
+        }
+
+        /* ================= PROYEK OFFLINE (JSON SAVE & LOAD) ================= */
+        function saveProjectOffline() {
+            const projectData = {
+                textData: document.getElementById('textVisualEditor').innerHTML,
+                tablesData: datasetTables,
+                filesData: uploadedFilesData
+            };
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(projectData));
+            const downloadAnchor = document.createElement('a');
+            downloadAnchor.setAttribute("href", dataStr);
+            downloadAnchor.setAttribute("download", "MultiTableProject_" + Date.now() + ".json");
+            document.body.appendChild(downloadAnchor);
+            downloadAnchor.click();
+            downloadAnchor.remove();
+            showToast("Proyek disimpan ke PC!");
+        }
+
+        function loadProjectOffline(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                try {
+                    const parsed = JSON.parse(e.target.result);
+                    if (parsed.textData !== undefined) document.getElementById('textVisualEditor').innerHTML = parsed.textData;
+                    if (parsed.tablesData !== undefined) datasetTables = parsed.tablesData;
+                    if (parsed.filesData !== undefined) uploadedFilesData = parsed.filesData;
+
+                    activeTableIdx = 0;
+                    renderActiveGrid();
+                    renderFileList();
+                    showToast("Proyek berhasil dimuat!");
+                } catch (err) {
+                    alert("Gagal membaca berkas proyek JSON. Pastikan format benar.");
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        /* ================= BUNDLING ENGINE LENGKAP ================= */
+        function runConversion() {
+            const textContentHTML = document.getElementById('textVisualEditor').innerHTML;
+
+            // 1. Generate Tables
+            let compiledTablesMarkup = "";
+            datasetTables.forEach((tbl, tIdx) => {
+                const currentTheme = tbl.theme || 'default';
+                compiledTablesMarkup += `\n    <div class="table-responsive-wrapper">`;
+                compiledTablesMarkup += `\n        <table class="custom-render-table theme-${currentTheme}" id="productionTable_${tIdx + 1}">`;
+                tbl.matrix.forEach((rowData, rIdx) => {
+                    compiledTablesMarkup += `\n            <tr style="height: ${tbl.rowHeights[rIdx]}px;">`;
+                    rowData.forEach((cellValue, cIdx) => {
+                        const info = tbl.mergeMap[rIdx][cIdx];
+                        if (info && info.isHidden) return;
+
+                        let mergeAttrs = "";
+                        if (info) {
+                            if (info.rowspan > 1) mergeAttrs += ` rowspan="${info.rowspan}"`;
+                            if (info.colspan > 1) mergeAttrs += ` colspan="${info.colspan}"`;
+                        }
+
+                        let inlineStyle = `width: ${tbl.colWidths[cIdx]}px;`;
+                        if (tbl.customBgMap && tbl.customBgMap[rIdx][cIdx]) {
+                            inlineStyle += ` background-color: ${tbl.customBgMap[rIdx][cIdx]} !important;`;
+                        }
+
+                        compiledTablesMarkup += `\n                <td${mergeAttrs} style="${inlineStyle}">${cellValue}</td>`;
+                    });
+                    compiledTablesMarkup += `\n            </tr>`;
+                });
+                compiledTablesMarkup += `\n        </table>\n    </div>\n`;
+            });
+
+            // 2. Generate Uploaded Files (Images & Attachments)
+            let filesMarkup = "";
+            const images = uploadedFilesData.filter(f => f.isImage);
+            const docs = uploadedFilesData.filter(f => !f.isImage);
+
+            if (images.length > 0 || docs.length > 0) {
+                filesMarkup += `\n    <div class="attachments-section">`;
+
+                if (images.length > 0) {
+                    filesMarkup += `\n        <h3 class="attachment-title">Gambar Lampiran</h3>\n        <div class="image-gallery">`;
+                    images.forEach(img => {
+                        filesMarkup += `\n            <img src="${img.dataURI}" alt="${img.name}" class="embedded-image">`;
+                    });
+                    filesMarkup += `\n        </div>`;
+                }
+
+                if (docs.length > 0) {
+                    filesMarkup += `\n        <h3 class="attachment-title">Dokumen Lampiran (Unduh)</h3>\n        <div class="doc-list">`;
+                    docs.forEach(doc => {
+                        filesMarkup += `\n            <a href="${doc.dataURI}" download="${doc.name}" class="download-button">💾 Download ${doc.name}</a>`;
+                    });
+                    filesMarkup += `\n        </div>`;
+                }
+                filesMarkup += `\n    </div>\n`;
+            }
+
+            finalGeneratedCode = `<!DOCTYPE html>
+<html lang="id">
+<head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Bundled Output Document</title>
+            <style>
+                body { font-family: 'Segoe UI', system-ui, sans-serif; line-height: 1.6; color: #334155; background-color: #f8fafc; padding: 24px; }
+                .document-container { max-width: 1000px; margin: 0 auto; background: #ffffff; padding: 32px; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
+                .text-content-section { margin-bottom: 24px; font-size: 1rem; color: #1e293b; }
+
+                /* Table Global Styles */
+                .table-responsive-wrapper { margin: 20px 0; overflow-x: auto; }
+                table.custom-render-table { width: max-content; table-layout: fixed; border-collapse: collapse; font-size: 0.875rem; text-align: left; border: 1px solid #cbd5e1; margin-bottom: 15px; }
+                table.custom-render-table td { border: 1px solid #cbd5e1; padding: 10px 14px; background: #ffffff; transition: background-color 0.2s; color: #334155; }
+                table.custom-render-table tr:hover td { background-color: #f1f5f9; }
+                .highlight-active-cell { background-color: #e0f2fe !important; font-weight: 600; }
+
+                /* PRESET THEMES CONFIGURATION */
+                table.theme-default tr:nth-child(1) td { background-color: #f8fafc; font-weight: bold; }
+
+                table.theme-modern-blue { border-color: #2563eb; }
+                table.theme-modern-blue td { border-color: #93c5fd; }
+                table.theme-modern-blue tr:nth-child(1) td { background-color: #2563eb !important; color: #ffffff !important; font-weight: bold; }
+
+                table.theme-emerald-green { border-color: #059669; }
+                table.theme-emerald-green td { border-color: #6ee7b7; }
+                table.theme-emerald-green tr:nth-child(1) td { background-color: #059669 !important; color: #ffffff !important; font-weight: bold; }
+
+                table.theme-luxury-dark { border-color: #1e293b; }
+                table.theme-luxury-dark td { border-color: #475569; background-color: #334155; color: #ffffff; }
+                table.theme-luxury-dark tr:nth-child(1) td { background-color: #0f172a !important; color: #38bdf8 !important; font-weight: bold; }
+
+                /* Attachment Styles */
+                .attachments-section { margin-top: 40px; padding-top: 20px; border-top: 2px dashed #cbd5e1; }
+                .attachment-title { font-size: 1.1rem; color: #475569; margin-bottom: 16px; }
+                .image-gallery { display: flex; flex-direction: column; gap: 16px; margin-bottom: 24px; }
+                .embedded-image { max-width: 100%; height: auto; border-radius: 8px; border: 1px solid #e2e8f0; }
+                .doc-list { display: flex; flex-wrap: wrap; gap: 12px; }
+                .download-button { display: inline-block; padding: 10px 16px; background: #f1f5f9; border: 1px solid #cbd5e1; border-radius: 6px; color: #0f172a; text-decoration: none; font-weight: 600; font-size: 0.9rem; transition: 0.2s; }
+                .download-button:hover { background: #e2e8f0; border-color: #94a3b8; }
+            </style>
+</head>
+<body>
+
+            <div class="document-container">
+                <div class="text-content-section">
+                    ${textContentHTML || ""}
+                </div>
+
+                ${compiledTablesMarkup}
+
+                ${filesMarkup}
+            </div>
+
+            <script>
+                document.addEventListener('DOMContentLoaded', () => {
+                    console.log('Sistem Dokumen Dimuat Offline Berhasil.');
+                    const cells = document.querySelectorAll('table.custom-render-table td');
+                    cells.forEach(cell => {
+                        cell.addEventListener('click', () => {
+                            cells.forEach(c => c.classList.remove('highlight-active-cell'));
+                            cell.classList.add('highlight-active-cell');
+                        });
+                    });
+                });
+            <\/script>
+
+</body>
+</html>`;
+
+            document.getElementById('codeOutputBox').value = finalGeneratedCode;
+            document.getElementById('livePreviewIframe').srcdoc = finalGeneratedCode;
+        }
+
+        function resetWorkspaceData() {
+            if (confirm("Bersihkan semua teks, tabel, dan file?")) {
+                document.getElementById('textVisualEditor').innerHTML = "";
+                datasetTables = [createFreshTableData(5, 5)]; activeTableIdx = 0; renderActiveGrid();
+                uploadedFilesData = []; renderFileList();
+                showToast("Workspace diatur ulang!");
+            }
+        }
+
+        window.addEventListener('load', () => {
+            datasetTables = [createFreshTableData(5, 5)];
+            renderActiveGrid();
+        });
+    </script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+
+            // =======================================
+            // ROOT_JAVA_NAMA FUNCTION_YUSUF SYSTEM
+            // =======================================
+            const root_java_nama = {
+                isStorming: false,
+                lightningTimer: null,
+
+                // Fungsi utama inisialisasi cuaca Yusuf
+                function_yusuf: function () {
+                    const trigger = document.querySelector(".yusuf-storm-trigger");
+                    const stormWrapper = document.getElementById("storm-wrapper");
+                    const rainContainer = document.getElementById("rain-container");
+                    const canvas = document.getElementById("lightning-canvas");
+                    const ctx = canvas.getContext("2d");
+                    const groundCracks = document.getElementById("ground-cracks");
+                    const groundFlash = document.getElementById("ground-flash");
+
+                    // Mengatur ukuran canvas layar penuh
+                    function resizeCanvas() {
+                        canvas.width = window.innerWidth;
+                        canvas.height = window.innerHeight;
+                    }
+                    window.addEventListener("resize", resizeCanvas);
+                    resizeCanvas();
+
+                    // 1. Sub-fungsi Membuat Hujan
+                    function generateRain() {
+                        rainContainer.innerHTML = "";
+                        const maxDrops = 150;
+                        for (let i = 0; i < maxDrops; i++) {
+                            const drop = document.createElement("div");
+                            drop.classList.add("yusuf-drop");
+                            drop.style.left = `${Math.random() * 100}%`;
+                            drop.style.top = `${Math.random() * -50}px`;
+                            drop.style.animationDuration = `${0.4 + Math.random() * 0.4}s`;
+                            drop.style.animationDelay = `${Math.random() * 1.5}s`;
+                            rainContainer.appendChild(drop);
+                        }
+                    }
+
+                    // 2. Sub-fungsi Menggambar Petir Lengkang-Lengkung (Fractal)
+                    function drawLightningFractal(startX, startY, endX, endY, displace, props) {
+                        if (displace < props.minDisplace) {
+                            ctx.beginPath();
+                            ctx.moveTo(startX, startY);
+                            ctx.lineTo(endX, endY);
+                            ctx.strokeStyle = props.color;
+                            ctx.lineWidth = props.width;
+                            ctx.shadowBlur = 15;
+                            ctx.shadowColor = "#00fff2";
+                            ctx.stroke();
+                            return;
+                        }
+
+                        const midX = (startX + endX) / 2 + (Math.random() - 0.5) * displace;
+                        const midY = (startY + endY) / 2 + (Math.random() - 0.5) * displace;
+
+                        drawLightningFractal(startX, startY, midX, midY, displace / 2, props);
+                        drawLightningFractal(midX, midY, endX, endY, displace / 2, props);
+
+                        // Membuat sub-cabang kecil liar di udara
+                        if (Math.random() < 0.12 && displace > 10) {
+                            const branchEndX = midX + (Math.random() - 0.5) * 80;
+                            const branchEndY = midY + Math.random() * 60;
+                            drawLightningFractal(midX, midY, branchEndX, branchEndY, displace / 2, {
+                                ...props,
+                                width: props.width * 0.5
+                            });
+                        }
+                    }
+
+                    // 3. Sub-fungsi Pemicu Ledakan Sambaran Petir
+                    const triggerLightningStrike = () => {
+                        if (!root_java_nama.isStorming) return;
+
+                        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+                        const triggerRect = trigger.getBoundingClientRect();
+                        const startX = Math.random() * canvas.width;
+                        const startY = 40;
+                        const endX = triggerRect.left + (Math.random() * triggerRect.width);
+                        const endY = canvas.height - 90;
+
+                        const properties = {
+                            color: "rgba(235, 255, 255, 1)",
+                            width: 3.5,
+                            minDisplace: 4
+                        };
+
+                        // Gambar kilatan petir
+                        drawLightningFractal(startX, startY, endX, endY, 160, properties);
+
+                        // Aktifkan visual efek sekunder (Guncangan & Retakan Tanah)
+                        stormWrapper.classList.add("ambient-flash");
+                        groundCracks.classList.add("cracks-active");
+                        groundFlash.classList.add("flash-active");
+                        document.body.classList.add("shake-body");
+
+                        // Bersihkan efek instan berkedip
+                        setTimeout(() => {
+                            ctx.clearRect(0, 0, canvas.width, canvas.height);
+                            stormWrapper.classList.remove("ambient-flash");
+                            document.body.classList.remove("shake-body");
+                        }, 180);
+
+                        setTimeout(() => {
+                            groundCracks.classList.remove("cracks-active");
+                            groundFlash.classList.remove("flash-active");
+                        }, 400);
+
+                        // Set giliran petir acak berikutnya jika kursor masih diam disana
+                        const nextStrike = 1000 + Math.random() * 2000;
+                        root_java_nama.lightningTimer = setTimeout(triggerLightningStrike, nextStrike);
+                    };
+
+                    // =======================================
+                    // EVENT LISTENERS (HOVER CONTROL)
+                    // =======================================
+
+                    // Ketika kursor diam/masuk ke area teks
+                    trigger.addEventListener("mouseenter", () => {
+                        root_java_nama.isStorming = true;
+
+                        // Aktifkan tema badai secara penuh
+                        document.body.classList.add("yusuf-storm-active");
+                        stormWrapper.classList.add("active");
+                        trigger.style.textShadow = "0 0 12px #00fff2, 0 0 25px #00fff2";
+
+                        generateRain();
+
+                        // Petir menyambar perdana setelah kursor diam 600ms
+                        root_java_nama.lightningTimer = setTimeout(triggerLightningStrike, 600);
+                    });
+
+                    // Ketika kursor keluar (Cuaca kembali cerah)
+                    trigger.addEventListener("mouseleave", () => {
+                        root_java_nama.isStorming = false;
+
+                        // Kembalikan ke tema cerah semula
+                        document.body.classList.remove("yusuf-storm-active");
+                        stormWrapper.classList.remove("active");
+                        trigger.style.textShadow = "none";
+
+                        clearTimeout(root_java_nama.lightningTimer);
+                        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+                        // Bersihkan tetesan hujan dari DOM
+                        setTimeout(() => {
+                            if (!root_java_nama.isStorming) rainContainer.innerHTML = "";
+                        }, 600);
+                    });
+                }
+            };
+
+            // Jalankan sistem cuaca Yusuf
+            root_java_nama.function_yusuf();
+        });
+    </script>
+
+    <script>
+        const modal = document.getElementById("donateModal");
+        const openBtn = document.getElementById("openDonateBtn");
+        const closeBtn = document.getElementById("closeDonateBtn");
+
+        const moneyRainContainer = document.getElementById("moneyRainContainer");
+        const skyScene = document.getElementById("skyScene");
+        const canvas = document.getElementById("rainbowCanvas");
+        const ctx = canvas.getContext("2d");
+
+        let rainInterval;
+        let animationFrameId;
+
+        // Variabel Kendali Animasi
+        let t = 0;
+        let stickmanDirection = 1; // 1 = Meluncur Turun, -1 = Memanjat Naik, 0 = Diam Sejenak
+        let blinkAlpha = 0.65;
+        let blinkDirection = 0.008; // Transisi kedap-kedip diperhalus pelan
+
+        function getBezierPoint(t, p0, p1, p2) {
+            const x = (1 - t) * (1 - t) * p0.x + 2 * (1 - t) * t * p1.x + t * t * p2.x;
+            const y = (1 - t) * (1 - t) * p0.y + 2 * (1 - t) * t * p1.y + t * t * p2.y;
+            return { x, y };
+        }
+
+        // Menggambar 4 Warna Pelangi Utama Pilihanmu (Merah, Kuning, Hijau, Biru)
+        function drawRainbow(p0, p1, p2) {
+            const customColors = [
+                "rgba(255, 50, 50, ",   // Merah
+                "rgba(255, 235, 50, ",  // Kuning
+                "rgba(50, 215, 50, ",   // Hijau
+                "rgba(50, 130, 255, "   // Biru
+            ];
+
+            ctx.save();
+            // Beri efek blur alami agar antar warna membaur natural
+            ctx.shadowBlur = 10;
+            ctx.shadowColor = "rgba(255,255,255,0.4)";
+
+            customColors.forEach((color, index) => {
+                ctx.beginPath();
+                ctx.moveTo(p0.x, p0.y);
+                ctx.quadraticCurveTo(p1.x, p1.y, p2.x, p2.y);
+                ctx.strokeStyle = color + blinkAlpha + ")";
+                ctx.lineWidth = 36 - (index * 5); // Ketebalan layer yang proporsional
+                ctx.lineCap = "round";
+                ctx.stroke();
+            });
+            ctx.restore();
+        }
+
+        // Desain Anatomi Stickman Alami & Proporsional
+        function drawStickman(pos, t, dir) {
+            ctx.save();
+            ctx.translate(pos.x, pos.y - 18);
+            ctx.strokeStyle = "#FFF"; // Warna abu gelap natural
+            ctx.lineWidth = 3;
+            ctx.lineCap = "round";
+
+            let frame = Math.floor(Date.now() / 150) % 4; // Ritme gerakan kaki/tangan lebih lambat
+
+            // KEPALA
+            ctx.beginPath();
+            ctx.arc(0, -18, 5, 0, Math.PI * 2);
+            ctx.fillStyle = "#FFF";
+            ctx.fill();
+            ctx.stroke();
+
+            // BADAN
+            ctx.beginPath();
+            ctx.moveTo(0, -13);
+            ctx.lineTo(0, 0);
+            ctx.stroke();
+
+            if (dir === 1) { // --- PERJALANAN TURUN ---
+                if (t > 0.15 && t < 0.85) {
+                    // Pose Meluncur (Sliding) Alami
+                    ctx.rotate(-0.25); // Condong rileks ke belakang
+                    // Posisi Kaki selonjoran santai mengikuti arus luncuran
+                    ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(10, 4); ctx.stroke();
+                    ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(7, 9); ctx.stroke();
+                    // Tangan diangkat ke atas menikmati seluncuran pelangi
+                    ctx.beginPath(); ctx.moveTo(0, -10); ctx.lineTo(-8, -18); ctx.stroke();
+                    ctx.beginPath(); ctx.moveTo(0, -10); ctx.lineTo(8, -16); ctx.stroke();
+                } else {
+                    // Pose Jalan Kaki Normal waktu keluar dari awan / mendarat
+                    let legCycle = frame % 2 === 0 ? 8 : 3;
+                    ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(-5, 10); ctx.stroke();
+                    ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(5, legCycle); ctx.stroke();
+                    ctx.beginPath(); ctx.moveTo(0, -10); ctx.lineTo(-4, -2); ctx.stroke();
+                    ctx.beginPath(); ctx.moveTo(0, -10); ctx.lineTo(4, -4); ctx.stroke();
+                }
+            } else { // --- PROSES MEMANJAT NAIK (Dibuat Lambat & Natural) ---
+                ctx.rotate(0.18); // Sedikit merunduk maju ke depan menahan beban tanjakan
+                let climbCycle = frame % 2 === 0;
+                // Langkah kaki memanjat secara bergiliran
+                ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(-6, climbCycle ? 10 : 5); ctx.stroke();
+                ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(4, climbCycle ? 4 : 10); ctx.stroke();
+                // Tangan menggapai ke depan menarik tubuh naik ke atas pelangi
+                ctx.beginPath(); ctx.moveTo(0, -10); ctx.lineTo(-10, -6); ctx.stroke();
+                ctx.beginPath(); ctx.moveTo(0, -10); ctx.lineTo(5, -1); ctx.stroke();
+            }
+
+            ctx.restore();
+        }
+
+        // Loop Animasi
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            if (canvas.width !== window.innerWidth || canvas.height !== window.innerHeight) {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+            }
+
+            const btnRect = openBtn.getBoundingClientRect();
+
+            const p0 = { x: 110, y: 75 };
+            const p2 = { x: btnRect.left + (btnRect.width / 2), y: btnRect.top };
+            const p1 = { x: (p0.x + p2.x) / 1.9, y: -130 };
+
+            // Efek Kedap Kedip Natural
+            blinkAlpha += blinkDirection;
+            if (blinkAlpha >= 0.8 || blinkAlpha <= 0.45) blinkDirection = -blinkDirection;
+
+            drawRainbow(p0, p1, p2);
+
+            // Pengaturan Kecepatan Durasi (Dibuat jauh lebih pelan agar natural)
+            if (stickmanDirection === 1) {
+                t += 0.0025; // Kecepatan meluncur turun diperlambat setengahnya
+                if (t >= 1) {
+                    t = 1;
+                    stickmanDirection = 0;
+                    setTimeout(() => { stickmanDirection = -1; }, 1200); // Istirahat sejenak di atas tombol
+                }
+            } else if (stickmanDirection === -1) {
+                t -= 0.0018; // Kecepatan memanjat naik dibuat sangat tenang dan realistis
+                if (t <= 0) {
+                    t = 0;
+                    stickmanDirection = 0;
+                    setTimeout(() => { stickmanDirection = 1; }, 600); // Jeda sebelum keluar awan kembali
+                }
+            }
+
+            const currentPos = getBezierPoint(t, p0, p1, p2);
+
+            if (stickmanDirection !== 0 || t > 0) {
+                drawStickman(currentPos, t, stickmanDirection === 0 ? -1 : stickmanDirection);
+            }
+
+            animationFrameId = requestAnimationFrame(animate);
+        }
+
+        function createMoney() {
+            const paperMoney = ['💵', '💸']; const coins = ['🪙'];
+            const isCoin = Math.random() > 0.5;
+            const item = document.createElement("div");
+            item.classList.add("money-item");
+
+            if (isCoin) {
+                item.innerText = coins[Math.floor(Math.random() * coins.length)];
+                item.classList.add("coin-animation");
+                item.style.fontSize = (Math.random() * 12 + 16) + 'px';
+            } else {
+                item.innerText = paperMoney[Math.floor(Math.random() * paperMoney.length)];
+                item.classList.add("bill-animation");
+                item.style.fontSize = (Math.random() * 16 + 22) + 'px';
+            }
+            item.style.left = Math.random() * 100 + 'vw';
+            item.style.animationDuration = (Math.random() * 1.5 + 2.5) + 's';
+
+            moneyRainContainer.appendChild(item);
+            setTimeout(() => { item.remove(); }, 4000);
+        }
+
+        // HOVER
+        openBtn.addEventListener("mouseenter", () => {
+            skyScene.style.display = "block";
+            moneyRainContainer.style.display = "block";
+            t = 0; stickmanDirection = 1;
+            animate();
+            rainInterval = setInterval(createMoney, 50);
+        });
+
+        openBtn.addEventListener("mouseleave", () => {
+            cancelAnimationFrame(animationFrameId);
+            clearInterval(rainInterval);
+            skyScene.style.display = "none";
+            moneyRainContainer.style.display = "none";
+            moneyRainContainer.innerHTML = '';
+        });
+
+        openBtn.onclick = function () {
+            modal.style.display = "flex";
+            cancelAnimationFrame(animationFrameId);
+            clearInterval(rainInterval);
+            skyScene.style.display = "none";
+            moneyRainContainer.style.display = "none";
+        }
+        closeBtn.onclick = function () { modal.style.display = "none"; }
+        window.onclick = function (event) { if (event.target == modal) { modal.style.display = "none"; } }
+    </script>
+</body>
+</html>

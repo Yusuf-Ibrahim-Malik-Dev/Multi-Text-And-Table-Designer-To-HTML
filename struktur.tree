@@ -1,0 +1,10 @@
+multi-table-designer/
+│
+├── assets/
+│   └── js/
+│       ├── mammoth.browser.min.js
+│       ├── pdf.min.js
+│       └── pdf.worker.min.js
+│
+├── index.html
+└── setup-assets.js
