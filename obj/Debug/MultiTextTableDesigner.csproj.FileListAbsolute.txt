@@ -1,0 +1,6 @@
+C:\Users\Admin\Desktop\MultiTextTableDesigner\bin\MultiTextTableDesigner.dll
+C:\Users\Admin\Desktop\MultiTextTableDesigner\bin\MultiTextTableDesigner.pdb
+C:\Users\Admin\Desktop\MultiTextTableDesigner\obj\Debug\MultiTextTableDesigner.csproj.AssemblyReference.cache
+C:\Users\Admin\Desktop\MultiTextTableDesigner\obj\Debug\MultiTextTableDesigner.csproj.CoreCompileInputs.cache
+C:\Users\Admin\Desktop\MultiTextTableDesigner\obj\Debug\MultiTextTableDesigner.dll
+C:\Users\Admin\Desktop\MultiTextTableDesigner\obj\Debug\MultiTextTableDesigner.pdb
