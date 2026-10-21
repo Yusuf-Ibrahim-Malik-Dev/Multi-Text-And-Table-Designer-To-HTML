@@ -1,6 +1,6 @@
 # Multi-Text-And-Table-Designer-To-HTML
 
-Url: https://yusuf-ibrahim-malik-dev.github.io/Multi-Text-And-Table-Designer-To-HTML/
+Url: https://yusuf-ibrahim-malik-dev.github.io/Multi-Text-And-Table-Designer-To-HTML/publish/
 
 Memudahkan membuat text dan table di html
 
